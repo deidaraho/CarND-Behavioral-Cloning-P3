@@ -108,7 +108,7 @@ def nVidiaModel():
     return model
 
 # Reading images locations.
-center_paths, left_paths, right_paths, measurements = find_images('./data/')
+center_paths, left_paths, right_paths, measurements = find_images('../data_p3/')
 image_paths, measurements = combine_images(center_paths, left_paths, right_paths, measurements, 0.2)
 print('Total Images: {}'.format(len(image_paths)))
 
@@ -120,9 +120,9 @@ train_samples, validation_samples = train_test_split(samples, test_size=0.2)
 print('Train samples: {}'.format(len(train_samples)))
 print('Validation samples: {}'.format(len(validation_samples)))
 
-# import pdb; pdb.set_trace();
-# test_samples(train_samples)
-# test_samples(validation_samples)
+#test_samples(train_samples)
+#test_samples(validation_samples)
+#import pdb; pdb.set_trace()
 train_generator = generator(train_samples, batch_size=32)
 validation_generator = generator(validation_samples, batch_size=32)
 
