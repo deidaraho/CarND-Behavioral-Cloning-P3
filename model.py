@@ -122,9 +122,10 @@ if __name__ == '__main__':
     print('Train samples: {}'.format(len(train_samples)))
     print('Validation samples: {}'.format(len(validation_samples)))
 
-    # import pdb; pdb.set_trace();
-    # test_samples(train_samples)
-    # test_samples(validation_samples)
+    #test_samples(train_samples)
+    #test_samples(validation_samples)
+    #import pdb; pdb.set_trace()
+
     train_generator = generator(train_samples, batch_size=32)
     validation_generator = generator(validation_samples, batch_size=32)
 
