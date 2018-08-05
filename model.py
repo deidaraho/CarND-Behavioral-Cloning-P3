@@ -2,6 +2,7 @@ import cv2
 import csv
 import numpy as np
 import os
+from keras.models import load_model
 
 def get_lines_from_log(path, skip_header=False):
     lines = []
@@ -107,39 +108,45 @@ def nVidiaModel():
     model.add(Dense(1))
     return model
 
-# Reading images locations.
-center_paths, left_paths, right_paths, measurements = find_images('./data/')
-image_paths, measurements = combine_images(center_paths, left_paths, right_paths, measurements, 0.2)
-print('Total Images: {}'.format(len(image_paths)))
+if __name__ == '__main__':
+    # Reading images locations.
+    center_paths, left_paths, right_paths, measurements = find_images('./data/')
+    image_paths, measurements = combine_images(center_paths, left_paths, right_paths, measurements, 0.2)
+    print('Total Images: {}'.format(len(image_paths)))
 
-# Splitting samples and creating generators.
-from sklearn.model_selection import train_test_split
-samples = list(zip(image_paths, measurements))
-train_samples, validation_samples = train_test_split(samples, test_size=0.2)
+    # Splitting samples and creating generators.
+    from sklearn.model_selection import train_test_split
+    samples = list(zip(image_paths, measurements))
+    train_samples, validation_samples = train_test_split(samples, test_size=0.2)
 
-print('Train samples: {}'.format(len(train_samples)))
-print('Validation samples: {}'.format(len(validation_samples)))
+    print('Train samples: {}'.format(len(train_samples)))
+    print('Validation samples: {}'.format(len(validation_samples)))
 
-# import pdb; pdb.set_trace();
-# test_samples(train_samples)
-# test_samples(validation_samples)
-train_generator = generator(train_samples, batch_size=32)
-validation_generator = generator(validation_samples, batch_size=32)
+    # import pdb; pdb.set_trace();
+    # test_samples(train_samples)
+    # test_samples(validation_samples)
+    train_generator = generator(train_samples, batch_size=32)
+    validation_generator = generator(validation_samples, batch_size=32)
 
-# Model creation
-model = nVidiaModel()
+    # Model creation
+    try:
+        model = load_model('./model.h5')
+        print('loading previouse model and tuning.')
+    except:
+        print('No previouse model for tuning.')
+        model = nVidiaModel()
 
-# Compiling and training the model
-model.compile(loss='mse', optimizer='adam')
-history_object = model.fit_generator(train_generator,
-samples_per_epoch=len(train_samples),
-validation_data=validation_generator,
-nb_val_samples=len(validation_samples),
-nb_epoch=3, verbose=1)
+    # Compiling and training the model
+    model.compile(loss='mse', optimizer='adam')
+    history_object = model.fit_generator(train_generator,
+    samples_per_epoch=len(train_samples),
+    validation_data=validation_generator,
+    nb_val_samples=len(validation_samples),
+    nb_epoch=3, verbose=1)
 
-model.save('model.h5')
-print(history_object.history.keys())
-print('Loss')
-print(history_object.history['loss'])
-print('Validation Loss')
-print(history_object.history['val_loss'])
+    model.save('model.h5')
+    print(history_object.history.keys())
+    print('Loss')
+    print(history_object.history['loss'])
+    print('Validation Loss')
+    print(history_object.history['val_loss'])
